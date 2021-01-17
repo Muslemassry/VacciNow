@@ -21,7 +21,7 @@ import com.vaccnow.healthportal.model.Application;
 public class MailUtil {
 
 	final static String username = "vaccnow123@gmail.com";
-    final static String password = "Vn@vaccnow1";
+    final static String password = "";
 
     static Properties prop = new Properties();
     static {
