@@ -145,9 +145,9 @@ public class MailUtil {
                     InternetAddress.parse(toEmail)
             );
             message.setSubject("VaccNow application Invoice");
-            String text = "<h1 style=\"color: #5e9ca0;\">VacciNow Confirmation!</h1>\r\n" + 
-            		"<h2 style=\"color: #2e6c80;\">Congratulation for vaccination:</h2>\r\n" + 
-            		"<h2 style=\"color: #2e6c80;\">Cleaning options:</h2>\r\n" + 
+            String text = "<h1 style=\"color: #5e9ca0;\">VacciNow Invoice!</h1>\r\n" + 
+            		"<h2 style=\"color: #2e6c80;\">Congratulation for Scheduling:</h2>\r\n" + 
+            		"<h2 style=\"color: #2e6c80;\">Items:</h2>\r\n" + 
             		"<table class=\"editorDemoTable\" style=\"height: 298px;\">\r\n" + 
             		"<thead>\r\n" + 
             		"<tr style=\"height: 18px;\">\r\n" + 
