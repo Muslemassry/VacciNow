@@ -1,5 +1,6 @@
 package com.vaccnow.healthportal.endpoint;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,10 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vaccnow.healthportal.Constants;
 import com.vaccnow.healthportal.model.Application;
+import com.vaccnow.healthportal.reponse.FawryResponse;
 import com.vaccnow.healthportal.reponse.MessageResponse;
 import com.vaccnow.healthportal.request.ApplicationRequestObj;
 import com.vaccnow.healthportal.service.VaccNowService;
 import com.vaccnow.healthportal.utils.MailUtil;
+import com.vaccnow.healthportal.utils.PaymentUtil;
 
 
 @RestController
@@ -70,14 +73,33 @@ public class VaccNowEndpoint {
 	@RequestMapping(path = "/vaccineCertificate", method = RequestMethod.PUT)
 	public ResponseEntity<?> vaccineCertificate(@RequestBody ApplicationRequestObj applicationRequestObj) {
 		Application confirmedApplication = vaccNowService.confirmVaccination(applicationRequestObj);
-		MailUtil.sendEmail(applicationRequestObj.getToEmail(), confirmedApplication);
+		MailUtil.sendConfirmationEmail(applicationRequestObj.getToEmail(), confirmedApplication);
 		return ResponseEntity.ok(confirmedApplication);
 	}
 	
 	@RequestMapping(path = "/scheduleVaccinationTimeslot", method = RequestMethod.POST)
 	public ResponseEntity<?> scheduleVaccinationTimeslot(@RequestBody ApplicationRequestObj applicationRequestObj) {
-		Integer id = vaccNowService.scheduleVaccinationTimeslot(applicationRequestObj);
-		return ResponseEntity.ok(new MessageResponse("the Schedule Id is: " + id));
+		String responseMessage = null;
+		try {
+			FawryResponse invoice = null;
+			if (applicationRequestObj.paymentType.equals("F")) {
+				invoice = PaymentUtil.doPayment();
+			}
+			
+			Integer id = vaccNowService.scheduleVaccinationTimeslot(applicationRequestObj);
+			
+			if (applicationRequestObj.paymentType.equals("F")) {
+				MailUtil.sendInvoiceEmail(applicationRequestObj.getToEmail(), invoice);
+			}
+			
+			responseMessage = "the Schedule Id is: " + id + ((applicationRequestObj.paymentType.equals("C")) ? "" : ("\nand email was send to email" + applicationRequestObj.getToEmail()));
+		} catch (IOException e) {
+			e.printStackTrace();
+			responseMessage = "Err: " + e.getMessage();
+			
+		}
+		
+		return ResponseEntity.ok(new MessageResponse(responseMessage));
 	}
 
 	public VaccNowService getVaccNowService() {

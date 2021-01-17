@@ -16,6 +16,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import com.vaccnow.healthportal.model.Application;
+import com.vaccnow.healthportal.reponse.FawryResponse;
 
 
 public class MailUtil {
@@ -32,7 +33,7 @@ public class MailUtil {
         prop.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
     }
     
-	public static void sendEmail(String toEmail, Application application) {
+	public static void sendConfirmationEmail(String toEmail, Application application) {
 		Session session = Session.getInstance(prop,
                 new javax.mail.Authenticator() {
                     protected PasswordAuthentication getPasswordAuthentication() {
@@ -116,20 +117,96 @@ public class MailUtil {
             		"<p><strong>&nbsp;</strong></p>\r\n" + 
             		"<p><strong>Enjoy your life</strong></p>\r\n" + 
             		"<p><strong>&nbsp;</strong></p>";
-//            message.setText(text);
-//
-//            Multipart mp = new MimeMultipart();
-//            MimeBodyPart htmlPart = new MimeBodyPart();
-//            htmlPart.setContent(message, "text/html");
-//            mp.addBodyPart(htmlPart);
-//            message.setContent(mp);
+     	   message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+     	   message.setContent(text,"text/html");
+     	  System.out.println("To send ========================>>>> ");
+          Transport.send(message);
+          System.out.println("SENT ========================>>>> ");
 
-//            System.out.println("To send ========================>>>> ");
-//            Transport.send(message);
-//            System.out.println("SENT ========================>>>> ");
-            
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+	}
+	
+	public static void sendInvoiceEmail(String toEmail, FawryResponse fawryResponse) {
+		Session session = Session.getInstance(prop,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
 
-//     	   message.setFrom(new InternetAddress(username));
+        try {
+
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress("vaccnow123@gmail.com"));
+            message.setRecipients(
+                    Message.RecipientType.TO,
+                    InternetAddress.parse(toEmail)
+            );
+            message.setSubject("VaccNow application Invoice");
+            String text = "<h1 style=\"color: #5e9ca0;\">VacciNow Confirmation!</h1>\r\n" + 
+            		"<h2 style=\"color: #2e6c80;\">Congratulation for vaccination:</h2>\r\n" + 
+            		"<h2 style=\"color: #2e6c80;\">Cleaning options:</h2>\r\n" + 
+            		"<table class=\"editorDemoTable\" style=\"height: 298px;\">\r\n" + 
+            		"<thead>\r\n" + 
+            		"<tr style=\"height: 18px;\">\r\n" + 
+            		"<td style=\"height: 18px; width: 274px;\">Type</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 363px;\">" +fawryResponse.getType() + "</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 0px;\">&nbsp;</td>\r\n" + 
+            		"</tr>\r\n" + 
+            		"</thead>\r\n" + 
+            		"<tbody>\r\n" + 
+            		"<tr style=\"height: 18px;\">\r\n" + 
+            		"<td style=\"height: 18px; width: 274px;\">Reference Number</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 363px;\">" +fawryResponse.getReferenceNumber()+ "</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 0px;\">&nbsp;</td>\r\n" + 
+            		"</tr>\r\n" + 
+            		"<tr style=\"height: 18px;\">\r\n" + 
+            		"<td style=\"height: 18px; width: 274px;\">Status Description</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 363px;\"><span style=\"color: #008000;\"><span style=\"font-size: 13px;\">"+fawryResponse.getStatusDescription()+"</span></span></td>\r\n" + 
+            		"<td style=\"height: 18px; width: 0px;\">&nbsp;</td>\r\n" + 
+            		"</tr>\r\n" + 
+            		"<tr style=\"height: 18px;\">\r\n" + 
+            		"<td style=\"height: 18px; width: 274px;\">Merchant RefNumber</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 363px;\">"+fawryResponse.getMerchantRefNumber()+"</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 0px;\">&nbsp;</td>\r\n" + 
+            		"</tr>\r\n" + 
+            		"<tr style=\"height: 18px;\">\r\n" + 
+            		"<td style=\"height: 18px; width: 274px;\">Order Amount</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 363px;\">"+fawryResponse.getOrderAmount()+"</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 0px;\">&nbsp;</td>\r\n" + 
+            		"</tr>\r\n" + 
+            		"<tr style=\"height: 18px;\">\r\n" + 
+            		"<td style=\"height: 18px; width: 274px;\">Payment Amount</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 363px;\">"+fawryResponse.getPaymentAmount()+"</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 0px;\">&nbsp;</td>\r\n" + 
+            		"</tr>\r\n" + 
+            		"<tr style=\"height: 18px;\">\r\n" + 
+            		"<td style=\"height: 18px; width: 274px;\">Fawry Fees</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 363px;\">"+fawryResponse.getFawryFees()+"</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 0px;\">&nbsp;</td>\r\n" + 
+            		"</tr>\r\n" + 
+            		"<tr style=\"height: 18px;\">\r\n" + 
+            		"<td style=\"height: 18px; width: 274px;\">Payment Method</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 363px;\">"+fawryResponse.getPaymentMethod()+"</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 0px;\">&nbsp;</td>\r\n" + 
+            		"</tr>\r\n" + 
+            		"<tr style=\"height: 26px;\">\r\n" + 
+            		"<td style=\"height: 26px; width: 274px;\">Customer Mobile</td>\r\n" + 
+            		"<td style=\"height: 26px; width: 363px;\"><span style=\"color: #ff0000;\"><span style=\"font-size: 17px;\">"+fawryResponse.getCustomerMobile()+"</span></span></td>\r\n" + 
+            		"<td style=\"height: 26px; width: 0px;\">&nbsp;</td>\r\n" + 
+            		"</tr>\r\n" + 
+            		"<tr style=\"height: 18px;\">\r\n" + 
+            		"<td style=\"height: 18px; width: 274px;\">Customer Mail</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 363px;\">"+fawryResponse.getCustomerMail()+"</td>\r\n" + 
+            		"<td style=\"height: 18px; width: 0px;\">&nbsp;</td>\r\n" + 
+            		"</tr>\r\n" + 
+            		"</tbody>\r\n" + 
+            		"</table>\r\n" + 
+            		"<p><strong>&nbsp;</strong></p>\r\n" + 
+            		"<p><strong>Enjoy your life</strong></p>\r\n" + 
+            		"<p><strong>&nbsp;</strong></p>";
      	   message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
      	   message.setContent(text,"text/html");
      	  System.out.println("To send ========================>>>> ");
